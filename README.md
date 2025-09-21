@@ -29,8 +29,7 @@ A comprehensive full-stack project management application built with **Django RE
 - **RESTful API**: Well-structured Django REST API with filtering and pagination
 - **Real-time Communication**: WebSocket-based chat system
 - **File Uploads**: Task and project file attachments
-- **Email Notifications**: Automated notification system
-- **Data Export**: Export capabilities for reports and analytics
+- **Notifications**: Automated notification system
 
 ## 🛠️ Tech Stack
 
