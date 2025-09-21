@@ -327,12 +327,18 @@ The application uses PostgreSQL as the primary database. Make sure to:
 ```bash
 cd backend
 python manage.py test
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+
 ```
 
-### Frontend Tests
+### Frontend Tests & Run
 ```bash
 cd frontend
 npm test
+npm install
+npm start
 ```
 
 ## 📈 Performance Optimizations
