@@ -554,6 +554,37 @@ const Projects = () => {
                       </div>
                     </div>
 
+                    {/* Task Status Summary (includes Review) */}
+                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {(() => {
+                        const stats = project.task_stats || {};
+                        const todo = stats.todo || 0;
+                        const inProg = stats.in_progress || 0;
+                        const review = stats.review || 0;
+                        const done = stats.done || stats.completed || 0;
+                        return (
+                          <>
+                            <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-gray-100">
+                              <span className="text-xs text-gray-600">To Do</span>
+                              <span className="text-xs font-semibold text-gray-700">{todo}</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-yellow-100">
+                              <span className="text-xs text-yellow-700">In Progress</span>
+                              <span className="text-xs font-semibold text-yellow-700">{inProg}</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-indigo-100">
+                              <span className="text-xs text-indigo-700">Review</span>
+                              <span className="text-xs font-semibold text-indigo-700">{review}</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-green-100">
+                              <span className="text-xs text-green-700">Done</span>
+                              <span className="text-xs font-semibold text-green-700">{done}</span>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+
                     {/* Teammates (Employee view) - Enhanced */}
                     {user?.role === 'employee' && Array.isArray(project.members) && project.members.length > 0 && (
                       <div className="pt-3">

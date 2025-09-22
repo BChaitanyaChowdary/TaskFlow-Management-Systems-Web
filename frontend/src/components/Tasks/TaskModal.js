@@ -179,6 +179,7 @@ const TaskModal = ({ task, onClose, onSuccess }) => {
   const statusOptions = [
     { value: 'todo', label: 'To Do' },
     { value: 'in_progress', label: 'In Progress' },
+    { value: 'review', label: 'Review' },
     { value: 'done', label: 'Done' },
   ];
 

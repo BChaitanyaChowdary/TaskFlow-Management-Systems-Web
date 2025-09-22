@@ -149,11 +149,12 @@ def task_analytics(request):
         total_tasks = Task.objects.filter(project__is_active=True).count()
         completed_tasks = Task.objects.filter(project__is_active=True, status='done').count()
         in_progress_tasks = Task.objects.filter(project__is_active=True, status='in_progress').count()
+        review_tasks = Task.objects.filter(project__is_active=True, status='review').count()
         todo_tasks = Task.objects.filter(project__is_active=True, status='todo').count()
         overdue_tasks = Task.objects.filter(
             project__is_active=True,
             due_date__lt=timezone.now(),
-            status__in=['todo', 'in_progress']
+            status__in=['todo', 'in_progress', 'review']
         ).count()
         
         # Tasks by assignee - get all unique assignees and their task counts
@@ -184,6 +185,7 @@ def task_analytics(request):
                     'total': user_tasks.count(),
                     'completed': user_tasks.filter(status='done').count(),
                     'in_progress': user_tasks.filter(status='in_progress').count(),
+                    'review': user_tasks.filter(status='review').count(),
                     'todo': user_tasks.filter(status='todo').count()
                 })
             except User.DoesNotExist:
@@ -226,10 +228,11 @@ def task_analytics(request):
         total_tasks = user_tasks.count()
         completed_tasks = user_tasks.filter(status='done').count()
         in_progress_tasks = user_tasks.filter(status='in_progress').count()
+        review_tasks = user_tasks.filter(status='review').count()
         todo_tasks = user_tasks.filter(status='todo').count()
         overdue_tasks = user_tasks.filter(
             due_date__lt=timezone.now(),
-            status__in=['todo', 'in_progress']
+            status__in=['todo', 'in_progress', 'review']
         ).count()
         
         # For employees, also show their own task performance
@@ -270,6 +273,7 @@ def task_analytics(request):
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks,
         'in_progress_tasks': in_progress_tasks,
+        'review_tasks': review_tasks if 'review_tasks' in locals() else 0,
         'todo_tasks': todo_tasks,
         'overdue_tasks': overdue_tasks,
         'completion_rate': round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 2),
@@ -311,6 +315,7 @@ def kanban_tasks(request):
     kanban_data = {
         'todo': TaskSerializer(tasks.filter(status='todo'), many=True).data,
         'in_progress': TaskSerializer(tasks.filter(status='in_progress'), many=True).data,
+        'review': TaskSerializer(tasks.filter(status='review'), many=True).data,
         'done': TaskSerializer(tasks.filter(status='done'), many=True).data,
     }
     
@@ -342,7 +347,7 @@ def update_task_status(request, task_id):
             return Response({'error': 'You can only update your assigned tasks'}, status=status.HTTP_403_FORBIDDEN)
     
     new_status = request.data.get('status')
-    if new_status not in ['todo', 'in_progress', 'done']:
+    if new_status not in ['todo', 'in_progress', 'review', 'done']:
         return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
     
     old_status = task.status

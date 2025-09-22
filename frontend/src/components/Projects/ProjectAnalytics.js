@@ -128,6 +128,13 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
       bgColor: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
     },
     {
+      title: 'Review',
+      value: displayAnalytics.review_tasks || 0,
+      icon: AlertCircle,
+      color: 'text-indigo-600',
+      bgColor: 'bg-gradient-to-br from-indigo-100 to-indigo-200',
+    },
+    {
       title: 'Overdue',
       value: displayAnalytics.overdue_tasks || 0,
       icon: AlertCircle,
@@ -171,7 +178,8 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
   const taskStatusData = [
     { label: 'Completed', value: analytics.completed_tasks || 0, color: '#10B981' },
     { label: 'In Progress', value: analytics.in_progress_tasks || 0, color: '#F59E0B' },
-    { label: 'To Do', value: (analytics.total_tasks || 0) - (analytics.completed_tasks || 0) - (analytics.in_progress_tasks || 0), color: '#6B7280' },
+    { label: 'Review', value: analytics.review_tasks || 0, color: '#6366F1' },
+    { label: 'To Do', value: (analytics.total_tasks || 0) - (analytics.completed_tasks || 0) - (analytics.in_progress_tasks || 0) - (analytics.review_tasks || 0), color: '#6B7280' },
   ];
 
   // Only show charts if we have meaningful data
@@ -189,15 +197,16 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
 
   // Chart data for tasks by status (same as dashboard)
   const statusChartData = {
-    labels: ['To Do', 'In Progress', 'Done'],
+    labels: ['To Do', 'In Progress', 'Review', 'Done'],
     datasets: [
       {
         data: [
           displayAnalytics.todo_tasks || 0,
           displayAnalytics.in_progress_tasks || 0,
+          displayAnalytics.review_tasks || 0,
           displayAnalytics.completed_tasks || 0,
         ],
-        backgroundColor: ['#6b7280', '#f59e0b', '#10b981'],
+        backgroundColor: ['#6b7280', '#f59e0b', '#a855f7', '#10b981'],
         borderWidth: 0,
       },
     ],
@@ -509,24 +518,31 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
                   <span className="font-medium text-gray-700">Completed</span>
                 </div>
                 <span className="font-bold text-green-700">{analytics.completed_tasks || 0}</span>
-          </div>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-indigo-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 bg-indigo-500 rounded-full"></div>
+                  <span className="font-medium text-gray-700">Review</span>
+                </div>
+                <span className="font-bold text-indigo-700">{analytics.review_tasks || 0}</span>
+              </div>
               <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-200">
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
                   <span className="font-medium text-gray-700">In Progress</span>
-          </div>
+                </div>
                 <span className="font-bold text-yellow-700">{analytics.in_progress_tasks || 0}</span>
-            </div>
+              </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
                   <span className="font-medium text-gray-700">To Do</span>
-            </div>
-                <span className="font-bold text-gray-700">{(analytics.total_tasks || 0) - (analytics.completed_tasks || 0) - (analytics.in_progress_tasks || 0)}</span>
+                </div>
+                <span className="font-bold text-gray-700">{(analytics.total_tasks || 0) - (analytics.completed_tasks || 0) - (analytics.in_progress_tasks || 0) - (analytics.review_tasks || 0)}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
         {/* Performance Metrics */}
         <Card className="p-8 bg-gradient-to-br from-white to-purple-50 border-0 shadow-xl">
@@ -585,6 +601,27 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
                 {analytics.team_members || 0}
               </span>
             </div>
+            {analytics.team_performance && analytics.team_performance.length > 0 && (
+              <div className="p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200">
+                <h4 className="text-sm font-semibold text-gray-800 mb-3">Team Member Performance</h4>
+                <div className="space-y-2">
+                  {analytics.team_performance.map((member, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span className="font-medium">{member.name}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="px-2 py-1 rounded bg-gray-100 text-gray-700">To Do: {Math.max(0, (member.total_assigned || 0) - (member.completed_tasks || 0) - (member.in_progress_tasks || 0) - (member.review_tasks || 0))}</span>
+                        <span className="px-2 py-1 rounded bg-yellow-100 text-yellow-700">In Prog: {member.in_progress_tasks || 0}</span>
+                        <span className="px-2 py-1 rounded bg-indigo-100 text-indigo-700">Review: {member.review_tasks || 0}</span>
+                        <span className="px-2 py-1 rounded bg-green-100 text-green-700">Done: {member.completed_tasks || 0}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       </div>

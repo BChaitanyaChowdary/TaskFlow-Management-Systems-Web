@@ -12,7 +12,7 @@ import {
   Users,
   User,
   LogOut,
-  Menu,
+  MoreHorizontal,
   X,
   Bell,
   Moon,
@@ -25,6 +25,13 @@ const Layout = ({ children }) => {
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return window.localStorage.getItem('tf_sidebar_collapsed') === '1';
+    } catch (e) {
+      return false;
+    }
+  });
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [logoutPassword, setLogoutPassword] = useState('');
   const [showNotif, setShowNotif] = useState(false);
@@ -175,9 +182,8 @@ const Layout = ({ children }) => {
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className={`fixed inset-y-0 left-0 flex w-64 flex-col shadow-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-          <div className="flex h-16 items-center justify-between px-4">
-            <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>TaskFlow</h1>
+        <div className={`fixed inset-y-0 left-0 flex w-64 flex-col shadow-xl transform transition-transform duration-300 ease-in-out ${isDarkMode ? 'bg-gray-800' : 'bg-white'} ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex h-16 items-center justify-end px-4">
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-gray-600"
@@ -209,26 +215,43 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className={`flex flex-col flex-grow border-r ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex h-16 items-center px-4">
-            <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>TaskFlow</h1>
+      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'} lg:flex-col transition-all duration-300 ease-in-out`}>
+        <div className={`flex flex-col flex-grow border-r ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} transition-all duration-300`}>
+          <div className="flex h-16 items-center px-4 justify-end">
+            {/* Collapse/Expand button (no brand inside sidebar) */}
+            <button
+              onClick={() => {
+                const next = !sidebarCollapsed;
+                setSidebarCollapsed(next);
+                try { window.localStorage.setItem('tf_sidebar_collapsed', next ? '1' : '0'); } catch(e) {}
+              }}
+              className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-500 hover:text-gray-600 hover:bg-gray-100'}`}
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
           </div>
-          <nav className="flex-1 px-4 py-4 space-y-2">
+          <nav className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-4'} py-4 space-y-2 overflow-hidden`}>
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''} px-3 py-2 text-sm font-medium rounded-md ${
                     isActive(item.href)
                       ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700'
                       : isDarkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
+                  onClick={() => {
+                    // Auto-collapse on desktop
+                    setSidebarCollapsed(true);
+                    try { window.localStorage.setItem('tf_sidebar_collapsed', '1'); } catch(e) {}
+                  }}
+                  title={sidebarCollapsed ? item.name : undefined}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  <Icon className={`${sidebarCollapsed ? '' : 'mr-3'} h-5 w-5`} />
+                  <span className={`${sidebarCollapsed ? 'hidden' : ''}`}>{item.name}</span>
                 </Link>
               );
             })}
@@ -237,15 +260,29 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className={sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'}>
         {/* Top bar */}
         <div className={`sticky top-0 z-40 flex h-16 items-center justify-between border-b px-4 lg:px-8 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className={`lg:hidden ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-600'}`}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+          <div className="relative flex items-center gap-3">
+            {/* Brand Title */}
+            <h1 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>TaskFlow</h1>
+            {/* Sidebar Toggle (three dots) */}
+            <button
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  setSidebarOpen(true);
+                } else {
+                  const next = !sidebarCollapsed;
+                  setSidebarCollapsed(next);
+                  try { window.localStorage.setItem('tf_sidebar_collapsed', next ? '1' : '0'); } catch(e) {}
+                }
+              }}
+              className={`lg:hidden p-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-500 hover:text-gray-600 hover:bg-gray-100'}`}
+              title="Open menu"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+          </div>
           
           <div className="flex items-center space-x-4 ml-auto">
             {/* Search Button */}

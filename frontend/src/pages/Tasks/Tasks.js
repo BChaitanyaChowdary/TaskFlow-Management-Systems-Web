@@ -118,6 +118,8 @@ const Tasks = () => {
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       case 'in_progress':
         return <Clock className="h-4 w-4 text-yellow-600" />;
+      case 'review':
+        return <AlertCircle className="h-4 w-4 text-indigo-600" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-600" />;
     }
@@ -127,6 +129,7 @@ const Tasks = () => {
     const variants = {
       todo: 'gray',
       in_progress: 'warning',
+      review: 'primary',
       done: 'success',
     };
     return (
@@ -154,6 +157,7 @@ const Tasks = () => {
     { value: '', label: 'All Statuses' },
     { value: 'todo', label: 'To Do' },
     { value: 'in_progress', label: 'In Progress' },
+    { value: 'review', label: 'Review' },
     { value: 'done', label: 'Done' },
   ];
 
@@ -331,11 +335,12 @@ const Tasks = () => {
         const projectSummary = taskList.reduce((acc, task) => {
           const projectName = task.project_name || 'No Project';
           if (!acc[projectName]) {
-            acc[projectName] = { total: 0, completed: 0, inProgress: 0, todo: 0 };
+            acc[projectName] = { total: 0, completed: 0, inProgress: 0, review: 0, todo: 0 };
           }
           acc[projectName].total++;
           if (task.status === 'done') acc[projectName].completed++;
           else if (task.status === 'in_progress') acc[projectName].inProgress++;
+          else if (task.status === 'review') acc[projectName].review++;
           else acc[projectName].todo++;
           return acc;
         }, {});
@@ -362,6 +367,10 @@ const Tasks = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-600">In Progress:</span>
                       <span className="font-medium text-yellow-600">{stats.inProgress}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Review:</span>
+                      <span className="font-medium text-indigo-600">{stats.review}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">To Do:</span>

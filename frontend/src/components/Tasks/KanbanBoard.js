@@ -107,6 +107,7 @@ const KanbanBoard = ({ projectId, onTaskCreate }) => {
   const columns = [
     { id: 'todo', title: 'To Do', color: 'bg-gray-100' },
     { id: 'in_progress', title: 'In Progress', color: 'bg-blue-100' },
+    { id: 'review', title: 'Review', color: 'bg-indigo-100' },
     { id: 'done', title: 'Done', color: 'bg-green-100' },
   ];
 
@@ -206,7 +207,7 @@ const KanbanBoard = ({ projectId, onTaskCreate }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {columns.map((column) => {
           const columnTasks = getTasksByStatus(column.id);
           

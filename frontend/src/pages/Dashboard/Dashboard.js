@@ -231,6 +231,13 @@ const Dashboard = () => {
       bgColor: 'bg-yellow-50',
     },
     {
+      name: 'Review',
+      value: analytics?.review_tasks || 0,
+      icon: Clock,
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
+    },
+    {
       name: 'Overdue',
       value: analytics?.overdue_tasks || 0,
       icon: AlertCircle,
@@ -241,28 +248,32 @@ const Dashboard = () => {
 
   // Chart data for tasks by status with animations
   const statusChartData = {
-    labels: ['To Do', 'In Progress', 'Done'],
+    labels: ['To Do', 'In Progress', 'Review', 'Done'],
     datasets: [
       {
         data: [
           analytics?.todo_tasks || 0,
           analytics?.in_progress_tasks || 0,
+          analytics?.review_tasks || 0,
           analytics?.completed_tasks || 0,
         ],
         backgroundColor: [
           'rgba(107, 114, 128, 0.8)',
           'rgba(245, 158, 11, 0.8)',
+          'rgba(99, 102, 241, 0.8)',
           'rgba(16, 185, 129, 0.8)'
         ],
         borderColor: [
           'rgb(107, 114, 128)',
           'rgb(245, 158, 11)',
+          'rgb(99, 102, 241)',
           'rgb(16, 185, 129)'
         ],
         borderWidth: 2,
         hoverBackgroundColor: [
           'rgba(107, 114, 128, 1)',
           'rgba(245, 158, 11, 1)',
+          'rgba(99, 102, 241, 1)',
           'rgba(16, 185, 129, 1)'
         ],
         hoverBorderWidth: 3,

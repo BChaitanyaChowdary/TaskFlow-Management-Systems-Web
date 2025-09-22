@@ -69,6 +69,7 @@ class Project(models.Model):
             'total': total_count,
             'todo': tasks.filter(status='todo').count(),
             'in_progress': tasks.filter(status='in_progress').count(),
+            'review': tasks.filter(status='review').count(),
             'done': tasks.filter(status='done').count(),
         }
 

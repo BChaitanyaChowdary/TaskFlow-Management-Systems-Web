@@ -251,6 +251,7 @@ def project_analytics(request, project_id):
         total_tasks = tasks.count()
         completed_tasks = tasks.filter(status='done').count()
         in_progress_tasks = tasks.filter(status='in_progress').count()
+        review_tasks = tasks.filter(status='review').count()
         todo_tasks = tasks.filter(status='todo').count()
         
         
@@ -311,11 +312,15 @@ def project_analytics(request, project_id):
                 # Combine both sets of tasks
                 user_tasks = (direct_tasks | assigned_tasks).distinct()
                 completed_count = user_tasks.filter(status='done').count()
+                in_progress_count = user_tasks.filter(status='in_progress').count()
+                review_count = user_tasks.filter(status='review').count()
                 
                 team_performance.append({
                     'name': user.get_full_name(),
                     'email': user.email,
                     'completed_tasks': completed_count,
+                    'in_progress_tasks': in_progress_count,
+                    'review_tasks': review_count,
                     'total_assigned': user_tasks.count()
                 })
             except User.DoesNotExist:
@@ -343,6 +348,7 @@ def project_analytics(request, project_id):
             'total_tasks': total_tasks,
             'completed_tasks': completed_tasks,
             'in_progress_tasks': in_progress_tasks,
+            'review_tasks': review_tasks,
             'todo_tasks': todo_tasks,
             'tasks_by_priority': tasks_by_priority,
             'completion_rate': round(completion_rate, 2),

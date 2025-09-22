@@ -89,6 +89,16 @@ const Kanban = () => {
             console.error('Failed to pause timer:', error);
           }
         }
+      } else if (status === 'review') {
+        // Pause timer when moving to review
+        if (activeSession && activeSession.task_id === taskId) {
+          try {
+            await pauseTimer();
+            toast.success('Timer paused - task moved to review');
+          } catch (error) {
+            console.error('Failed to pause timer:', error);
+          }
+        }
       }
       
       return result;
@@ -105,12 +115,13 @@ const Kanban = () => {
             data: {
               todo: [...(data.todo || [])],
               in_progress: [...(data.in_progress || [])],
+              review: [...(data.review || [])],
               done: [...(data.done || [])],
             }
           };
           // Remove task from any column
           let task;
-          for (const col of ['todo', 'in_progress', 'done']) {
+          for (const col of ['todo', 'in_progress', 'review', 'done']) {
             const idx = clone.data[col].findIndex((t) => t.id === taskId);
             if (idx !== -1) {
               task = { ...clone.data[col][idx] };
@@ -237,7 +248,7 @@ const Kanban = () => {
     );
   };
 
-  // Normalize axios response: extract .data which contains { todo, in_progress, done }
+  // Normalize axios response: extract .data which contains { todo, in_progress, review, done }
   const data = kanbanData?.data || {};
 
   const columns = [
@@ -256,6 +267,14 @@ const Kanban = () => {
       borderColor: 'border-yellow-200',
       textColor: 'text-yellow-700',
       tasks: data?.in_progress || [],
+    },
+    {
+      id: 'review',
+      title: 'Review',
+      color: 'bg-gradient-to-br from-indigo-50 to-indigo-100',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      tasks: data?.review || [],
     },
     {
       id: 'done',
@@ -354,7 +373,7 @@ const Kanban = () => {
       )}
 
       {/* Kanban Board */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {columns.map((column) => (
           <div key={column.id} className="flex flex-col">
             {/* Column Header */}
@@ -461,6 +480,7 @@ const Kanban = () => {
                   <div className="text-gray-400 mb-2">
                     {column.id === 'todo' && <AlertCircle className="h-8 w-8" />}
                     {column.id === 'in_progress' && <Clock className="h-8 w-8" />}
+                    {column.id === 'review' && <AlertCircle className="h-8 w-8" />}
                     {column.id === 'done' && <CheckCircle className="h-8 w-8" />}
                   </div>
                   <p className="text-gray-500 text-sm font-medium">No tasks</p>

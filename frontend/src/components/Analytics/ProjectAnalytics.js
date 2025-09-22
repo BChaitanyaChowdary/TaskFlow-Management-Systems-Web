@@ -134,6 +134,13 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
       bgColor: 'bg-gradient-to-br from-amber-100 via-yellow-100 to-amber-200',
     },
     {
+      title: 'Review',
+      value: displayAnalytics.review_tasks || 0,
+      icon: AlertCircle,
+      color: 'text-indigo-600',
+      bgColor: 'bg-gradient-to-br from-indigo-100 via-purple-100 to-indigo-200',
+    },
+    {
       title: 'Overdue',
       value: displayAnalytics.overdue_tasks || 0,
       icon: AlertCircle,
@@ -175,28 +182,32 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
 
   // Chart data for tasks by status with beautiful colors
   const statusChartData = {
-    labels: ['To Do', 'In Progress', 'Done'],
+    labels: ['To Do', 'In Progress', 'Review', 'Done'],
     datasets: [
       {
         data: [
           displayAnalytics.todo_tasks || 0,
           displayAnalytics.in_progress_tasks || 0,
+          displayAnalytics.review_tasks || 0,
           displayAnalytics.completed_tasks || 0,
         ],
         backgroundColor: [
           'rgba(99, 102, 241, 0.8)',
           'rgba(245, 158, 11, 0.8)',
+          'rgba(168, 85, 247, 0.8)',
           'rgba(16, 185, 129, 0.8)'
         ],
         borderColor: [
           'rgb(99, 102, 241)',
           'rgb(245, 158, 11)',
+          'rgb(168, 85, 247)',
           'rgb(16, 185, 129)'
         ],
         borderWidth: 3,
         hoverBackgroundColor: [
           'rgba(99, 102, 241, 1)',
           'rgba(245, 158, 11, 1)',
+          'rgba(168, 85, 247, 1)',
           'rgba(16, 185, 129, 1)'
         ],
         hoverBorderWidth: 5,
@@ -356,15 +367,16 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
     }
   };
 
-  // Line Chart Data for Task Trends - Using Only Original Project Data
+  // Line Chart Data for Task Trends - include Review
   const taskTrendData = {
-    labels: ['To Do', 'In Progress', 'Completed'],
+    labels: ['To Do', 'In Progress', 'Review', 'Completed'],
     datasets: [
       {
         label: 'Task Status',
         data: [
           displayAnalytics.todo_tasks || 0,
           displayAnalytics.in_progress_tasks || 0,
+          displayAnalytics.review_tasks || 0,
           displayAnalytics.completed_tasks || 0
         ],
         borderColor: 'rgb(59, 130, 246)',
@@ -446,9 +458,9 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
     }
   };
 
-  // Radar Chart Data for Team Performance - Using Only Original Project Data
+  // Radar Chart Data for Team Performance - include Review
   const teamPerformanceData = {
-    labels: ['Total Tasks', 'Completed', 'In Progress', 'Overdue', 'Todo', 'Completion Rate'],
+    labels: ['Total Tasks', 'Completed', 'In Progress', 'Review', 'Overdue', 'Todo', 'Completion Rate'],
     datasets: [
       {
         label: 'Project Metrics',
@@ -456,6 +468,7 @@ const ProjectAnalytics = ({ projectId, projectName, analytics: propAnalytics }) 
           displayAnalytics.total_tasks || 0,
           displayAnalytics.completed_tasks || 0,
           displayAnalytics.in_progress_tasks || 0,
+          displayAnalytics.review_tasks || 0,
           displayAnalytics.overdue_tasks || 0,
           displayAnalytics.todo_tasks || 0,
           completionRate
