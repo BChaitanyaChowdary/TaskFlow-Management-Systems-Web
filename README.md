@@ -9,7 +9,6 @@ A comprehensive full-stack project management application built with **Django RE
 - **Project Management**: Create, manage, and track multiple projects with team collaboration
 - **Task Management**: Comprehensive task creation, assignment, and tracking with priority levels
 - **Kanban Board**: Visual task management with drag-and-drop functionality
-- **Time Tracking**: Built-in time tracking with session management and analytics
 - **Real-time Chat**: Project-specific team communication with message history
 - **Analytics Dashboard**: Beautiful data visualization with Chart.js (Donut & Bar charts)
 - **Global Search**: Search across tasks, projects, and team members
